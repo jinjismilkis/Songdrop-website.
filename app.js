@@ -3,6 +3,9 @@ const STORAGE_KEY = "songdrop-dedications-v1";
 let dedications = loadDedications();
 let activeFilter = "All";
 let wallSearchTerm = "";
+let selectedSong = null;
+let songSearchTimer = null;
+let songSearchRequest = 0;
 let voiceBlob = null;
 let mediaRecorder = null;
 let audioChunks = [];
@@ -73,11 +76,11 @@ function updatePreview(){
   $("previewMood").textContent="✦ "+$("mood").value.toUpperCase();
   const cover=$("coverUrl").value.trim();
   const thumb=$("livePreview").querySelector(".song-thumb");
-  thumb.innerHTML=cover?`<img src="${escapeHtml(cover)}" alt="Album cover" onerror="this.remove()">`:"♫";
+  thumb.innerHTML=cover?`<img class="preview-thumb-image" src="${escapeHtml(cover)}" alt="Album cover" onerror="this.remove()">`:"♫";
   $("livePreview").className="dedication-card theme-"+$("theme").value;
   $("messageCount").textContent=$("message").value.length+" / 280";
 }
-["recipient","message","songTitle","artist","mood","theme","coverUrl"].forEach(id=>$(id).addEventListener("input",updatePreview));
+["recipient","message","mood","theme"].forEach(id=>$(id).addEventListener("input",updatePreview));
 $("mood").addEventListener("change",updatePreview);
 $("theme").addEventListener("change",updatePreview);
 $("anonymous").addEventListener("change",()=> $("senderWrap").classList.toggle("hidden",$("anonymous").checked));
@@ -86,13 +89,13 @@ $("dedicationForm").addEventListener("submit",e=>{
   const clipStartValue=$("clipStart").value.trim(),clipEndValue=$("clipEnd").value.trim();
   if((clipStartValue!=="" || clipEndValue!=="") && !validClip(clipStartValue,clipEndValue)){toast("Enter both clip times, and make sure the end is after the start.");return;}
   const item={id:makeId(),recipient:$("recipient").value.trim(),message:$("message").value.trim(),mood:$("mood").value,theme:$("theme").value,songTitle:$("songTitle").value.trim(),artist:$("artist").value.trim(),songUrl:$("songUrl").value.trim(),coverUrl:$("coverUrl").value.trim(),clipStart:$("clipStart").value,clipEnd:$("clipEnd").value,anonymous:$("anonymous").checked,sender:$("anonymous").checked?"":$("sender").value.trim(),mystery:$("mystery").checked,allowReplies:$("allowReplies").checked,reactions:{heart:0,fire:0},replies:[],createdAt:new Date().toISOString(),voice:null};
-  if(!item.recipient||!item.message||!item.songTitle){toast("Please complete the required fields.");return;}
+  if(!item.recipient||!item.message||!item.songTitle||!item.songUrl){toast("Please complete your dedication and choose a song from search.");return;}
   if(voiceBlob){const reader=new FileReader();reader.onload=()=>{item.voice=reader.result;storeItem(item)};reader.readAsDataURL(voiceBlob);}
   else storeItem(item);
 });
 function storeItem(item){
   dedications.unshift(item);saveDedications();renderWall();showCreated(item);toast("Your song card is ready!");
-  $("dedicationForm").reset();voiceBlob=null;if(voiceUrl)URL.revokeObjectURL(voiceUrl);voiceUrl=null;$("voicePlayback").classList.add("hidden");$("clearVoice").classList.add("hidden");$("recordStatus").textContent="A little voice note";$("recordHint").textContent="Up to 30 seconds · saved on this device";$("senderWrap").classList.add("hidden");updatePreview();
+  $("dedicationForm").reset();selectedSong=null;$("songSearchResults").innerHTML="";$("songSearchStatus").textContent="Start typing to find a song.";$("selectedSong").classList.add("hidden");$("selectedSong").innerHTML="";voiceBlob=null;if(voiceUrl)URL.revokeObjectURL(voiceUrl);voiceUrl=null;$("voicePlayback").classList.add("hidden");$("clearVoice").classList.add("hidden");$("recordStatus").textContent="A little voice note";$("recordHint").textContent="Up to 30 seconds · saved on this device";$("senderWrap").classList.add("hidden");updatePreview();
 }
 function showCreated(item){
   const box=$("createdResult");box.classList.remove("hidden");
@@ -125,7 +128,7 @@ function openCard(id){
   const d=dedications.find(x=>x.id===id);if(!d)return;
   const dialog=$("cardDialog"),content=$("dialogContent");
   const senderLabel=d.anonymous?"Someone sent this":("Sent by "+(d.sender||"a friend"));
-  content.innerHTML=`<div class="dialog-card"><div class="eyebrow">${escapeHtml(d.mood.toUpperCase())} · A SONG FOR ${escapeHtml(d.recipient.toUpperCase())}</div><h3>${d.mystery?"A mystery song for you ✦":"A little song dedication"}</h3><p>“${escapeHtml(d.message)}”</p><div class="song-line"><div class="song-thumb">♫</div><div class="song-meta"><b>${escapeHtml(d.songTitle)}</b><small>${escapeHtml(d.artist||"Unknown artist")}</small></div></div><p class="fine-print">${senderLabel}</p>${d.songUrl?songPlayerMarkup(d.songUrl,d.coverUrl,d.clipStart,d.clipEnd):""}${d.voice?'<div class="listen-section"><b>Voice dedication</b><audio controls style="width:100%" src="'+d.voice+'"></audio></div>':""}
+  content.innerHTML=`<div class="dialog-card"><div class="eyebrow">${escapeHtml(d.mood.toUpperCase())} · A SONG FOR ${escapeHtml(d.recipient.toUpperCase())}</div><h3>${d.mystery?"A mystery song for you ✦":"A little song dedication"}</h3><p>“${escapeHtml(d.message)}”</p><div class="song-line"><div class="song-thumb">${d.coverUrl?`<img src="${escapeHtml(d.coverUrl)}" alt="Album cover">`:"♫"}</div><div class="song-meta"><b>${escapeHtml(d.songTitle)}</b><small>${escapeHtml(d.artist||"Unknown artist")}</small></div></div><p class="fine-print">${senderLabel}</p>${d.songUrl?songPlayerMarkup(d.songUrl,d.coverUrl,d.clipStart,d.clipEnd):""}${d.voice?'<div class="listen-section"><b>Voice dedication</b><audio controls style="width:100%" src="'+d.voice+'"></audio></div>':""}
     ${d.mystery?`<div class="reply-list"><b>Who do you think sent this?</b><form id="guessForm"><input id="guessInput" maxlength="45" placeholder="Your guess"><button class="small-button">Submit guess</button></form><p id="guessResult"></p></div>`:""}
     <div class="reply-list"><b>Reactions</b><button class="small-button" id="heartReact">♡ Send a heart</button> <button class="small-button" id="fireReact">✦ Send a sparkle</button></div>
     ${d.allowReplies?`<div class="reply-list"><b>Replies (${d.replies.length})</b>${d.replies.map(r=>`<p><b>${escapeHtml(r.name||"Someone")}:</b> ${escapeHtml(r.text)}</p>`).join("")||"<p>No replies yet. Leave the first one.</p>"}<form class="reply-form" id="replyForm"><input id="replyName" maxlength="35" placeholder="Your name (optional)"><input id="replyText" maxlength="180" placeholder="Write a kind reply..." required><button class="small-button">Send reply</button></form></div>`:""}
@@ -157,6 +160,44 @@ $("recordBtn").addEventListener("click",async()=>{
 function stopRecording(){if(mediaRecorder?.state==="recording"){mediaRecorder.stop();$("stopBtn").classList.add("hidden");$("recordBtn").classList.remove("hidden");}}
 $("stopBtn").addEventListener("click",stopRecording);
 $("clearVoice").addEventListener("click",()=>{voiceBlob=null;if(voiceUrl)URL.revokeObjectURL(voiceUrl);voiceUrl=null;$("voicePlayback").src="";$("voicePlayback").classList.add("hidden");$("clearVoice").classList.add("hidden");$("recordStatus").textContent="A little voice note";$("recordHint").textContent="Up to 30 seconds · saved on this device";});
+
+
+async function searchSongs(term){
+  const request=++songSearchRequest;
+  const status=$("songSearchStatus"),results=$("songSearchResults");
+  if(term.trim().length<2){status.textContent="Type at least 2 letters to search.";results.innerHTML="";return;}
+  status.textContent="Searching songs…";results.innerHTML="";
+  try{
+    const response=await fetch("https://itunes.apple.com/search?term="+encodeURIComponent(term.trim())+"&entity=song&limit=10&country=PH");
+    if(!response.ok)throw new Error("Search unavailable");
+    const data=await response.json();
+    if(request!==songSearchRequest)return;
+    const tracks=(data.results||[]).filter(t=>t.trackName&&t.artistName);
+    status.textContent=tracks.length?tracks.length+" songs found. Choose one to add it to your card.":"No songs found. Try another title or artist.";
+    results.innerHTML=tracks.map((t,i)=>`<button type="button" class="song-result" data-song-index="${i}">
+      <img src="${escapeHtml((t.artworkUrl100||"").replace("100x100","200x200"))}" alt="" loading="lazy">
+      <span class="song-result-copy"><b>${escapeHtml(t.trackName)}</b><small>${escapeHtml(t.artistName)} · ${escapeHtml(t.collectionName||"Single")}</small></span>
+      <span class="song-result-play">${t.previewUrl?"▶ PREVIEW":"SELECT"}</span>
+    </button>`).join("");
+    results.querySelectorAll("[data-song-index]").forEach((button,i)=>button.addEventListener("click",()=>selectSong(tracks[i])));
+  }catch(error){if(request===songSearchRequest){status.textContent="Song search is unavailable right now. Please try again.";results.innerHTML="";}}
+}
+function selectSong(track){
+  selectedSong=track;
+  $("songTitle").value=track.trackName||"";
+  $("artist").value=track.artistName||"";
+  $("songUrl").value=track.previewUrl||"";
+  $("coverUrl").value=(track.artworkUrl100||"").replace("100x100","600x600");
+  $("clipStart").value="";
+  $("clipEnd").value="";
+  $("songSearchStatus").textContent=track.previewUrl?"Song selected. Play the preview below.":"Song selected, but a preview is not available for this track.";
+  const artwork=$("coverUrl").value;
+  $("selectedSong").classList.remove("hidden");
+  $("selectedSong").innerHTML=`<img src="${escapeHtml(artwork)}" alt="Album cover"><div class="selected-song-copy"><b>${escapeHtml(track.trackName)}</b><small>${escapeHtml(track.artistName)} · Selected song</small>${track.previewUrl?`<audio controls preload="none" src="${escapeHtml(track.previewUrl)}"></audio>`:"<small>No playable preview supplied for this song.</small>"}</div><button type="button" id="removeSelectedSong">Change</button>`;
+  $("removeSelectedSong").onclick=()=>{selectedSong=null;$("songTitle").value="";$("artist").value="";$("songUrl").value="";$("coverUrl").value="";$("selectedSong").classList.add("hidden");$("selectedSong").innerHTML="";$("songSearchStatus").textContent="Choose a song from the search results.";updatePreview();};
+  updatePreview();
+}
+$("songSearchInput").addEventListener("input",e=>{clearTimeout(songSearchTimer);const term=e.target.value;songSearchTimer=setTimeout(()=>searchSongs(term),350);});
 
 function handleHash(){const match=location.hash.match(/card=([^&]+)/);if(match){const id=decodeURIComponent(match[1]);setTimeout(()=>openCard(id),100);}}
 $("wallSearch").addEventListener("input",e=>{wallSearchTerm=e.target.value;renderWall();});
