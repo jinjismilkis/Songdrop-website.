@@ -1,56 +1,45 @@
-# songdrop — SendTheSong-inspired starter
+# songdrop. — Spotify song dedication website
 
-A responsive, front-end-only song dedication website built with plain HTML, CSS and JavaScript.
+A responsive song-dedication website built with HTML, CSS and JavaScript.
 
-## Project structure
+## Pages
 
-```text
-sendthesong-inspired/
-├── index.html
-├── styles.css
-├── app.js
-└── README.md
-```
+- `index.html`: Discover page and Song Wall.
+- `create.html`: Separate dedication creation studio with Spotify search and live card preview.
+- `styles.css`: Desktop and mobile-first responsive design.
+- `app.js`: Spotify connection, catalog search, cards, reactions and replies.
 
 ## Run locally
 
-1. Extract the project folder.
-2. Open `index.html` in a modern browser, or serve the folder with a local development server:
-   - VS Code: install/use Live Server, then choose **Open with Live Server**.
-   - Python: run `python -m http.server 8000` in this folder, then visit `http://localhost:8000`.
-3. Create a dedication and test the song wall, reactions, replies, QR card, mood selector and voice recorder.
+Use VS Code Live Server or another local web server. Open `create.html` to create a dedication. Spotify OAuth requires HTTPS or localhost.
 
-## Implemented in this starter
+## Set up Spotify catalog search
 
-- Responsive hybrid visual design inspired by song dedication sites.
-- Live dedication card preview and four card themes.
-- Create dedications with recipient, message, mood, song title, artist and optional song URL.
-- Play supported songs directly inside a dedication card using YouTube, Spotify, SoundCloud, or direct audio-file links (MP3, WAV, OGG, M4A, AAC, FLAC).
-- Anonymous sender and mystery-mode options.
-- Song wall with mood filters.
-- Heart and sparkle reactions.
-- Replies on cards when enabled.
-- Shareable hash links (`#card=...`).
-- QR code generation (uses QRCode.js CDN, so QR rendering needs an internet connection).
-- Browser voice recording (requires microphone permission and a secure context such as `localhost` or HTTPS).
+Spotify requires a developer app and a Client ID. The Client ID is public and is stored in this browser only. Do not put a Spotify client secret in this front-end project.
 
-## Important limitations
+1. Open the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/) and sign in.
+2. Create a Spotify app and copy its **Client ID**.
+3. In the app settings, add the exact Redirect URI for your creation page. Examples:
+   - Local Live Server: `http://127.0.0.1:5500/create.html` (use the exact host and port shown by Live Server).
+   - Deployed website: `https://YOUR-USERNAME.github.io/YOUR-REPOSITORY/create.html`
+4. Save the Spotify app settings.
+5. Open songdrop's `create.html`, expand the Spotify Client ID setup if needed, paste the Client ID, save it, then choose **Connect**.
+6. Approve Spotify access. Search by track, artist or album and select a result.
 
-This is a working **local prototype**, not a deployed multi-user service:
-- Data is stored in the browser's `localStorage`. It does not sync between devices or users.
-- Share links and QR codes open the card only in the same browser profile where the card was created. For real public sharing, connect a backend/database and deploy the app.
-- Voice recordings are stored in the local browser data with the dedication. Large recordings can exceed browser storage limits. Keep recordings short.
-- Song playback uses official third-party embeds or a user-provided direct audio URL. The site does not download or host copyrighted music. Some songs or regions may not allow embedding, and visitors need an internet connection. Playback starts only when the visitor presses play.
-- The anonymous and mystery settings are presentation features, not guaranteed anonymity. Do not use them for sensitive messages.
-- No accounts, server-side moderation, spam protection, or production-grade privacy controls are included.
+The website uses Spotify's Authorization Code with PKCE flow. It does not need a client secret. If the redirect URI does not exactly match the value registered in the Spotify Dashboard, sign-in will fail.
 
-## Suggested next development step
+## Spotify playback
 
-Add a backend (for example, Supabase) with authenticated administration, public card IDs, access rules, content reporting, rate limiting, and durable audio storage before opening it to real users.
+Selected songs use Spotify's official embedded player. Playback and availability depend on Spotify, the track, region, browser and the listener's Spotify account. Some tracks require a Spotify Premium account for full playback. This website does not download or host music.
 
+## Current prototype limitations
 
-## Album artwork and song clips
-- Add an optional public album-cover image URL when creating a dedication. The image appears in the vinyl record label and song thumbnail.
-- Set both **Clip starts at** and **Clip ends at** in seconds to select a song portion (for example, 35 and 65).
-- Clip timing is applied to YouTube embeds and direct audio file links. Spotify and SoundCloud embeds use their own playback controls and do not accept this custom clip range in this prototype.
-- Only use artwork and audio links you have permission to share.
+- Dedications are saved in browser localStorage. They do not sync between devices or users.
+- Song Wall cards are visible only in the browser where they were created.
+- Spotify access tokens are kept in local browser storage for this prototype. If a session expires, reconnect Spotify.
+- This is a front-end prototype. Add a backend/database, account system, server-side token handling, moderation and privacy controls before launching it as a public multi-user service.
+- The website is not affiliated with Spotify. Spotify names and marks belong to Spotify.
+
+## Publish with GitHub Pages
+
+In the repository, open **Settings → Pages**, select **Deploy from a branch**, choose the `main` branch and `/(root)`, then save. Once published, register the exact `create.html` URL as a Spotify Redirect URI.
