@@ -89,7 +89,7 @@ $("dedicationForm").addEventListener("submit",e=>{
   const clipStartValue=$("clipStart").value.trim(),clipEndValue=$("clipEnd").value.trim();
   if((clipStartValue!=="" || clipEndValue!=="") && !validClip(clipStartValue,clipEndValue)){toast("Enter both clip times, and make sure the end is after the start.");return;}
   const item={id:makeId(),recipient:$("recipient").value.trim(),message:$("message").value.trim(),mood:$("mood").value,theme:$("theme").value,songTitle:$("songTitle").value.trim(),artist:$("artist").value.trim(),songUrl:$("songUrl").value.trim(),coverUrl:$("coverUrl").value.trim(),clipStart:$("clipStart").value,clipEnd:$("clipEnd").value,anonymous:$("anonymous").checked,sender:$("anonymous").checked?"":$("sender").value.trim(),mystery:$("mystery").checked,allowReplies:$("allowReplies").checked,reactions:{heart:0,fire:0},replies:[],createdAt:new Date().toISOString(),voice:null};
-  if(!item.recipient||!item.message||!item.songTitle||!item.songUrl){toast("Please complete your dedication and choose a song from search.");return;}
+  if(!item.recipient||!item.message||!item.songTitle||!selectedSong){toast("Please complete your dedication and choose a song from search.");return;}
   if(voiceBlob){const reader=new FileReader();reader.onload=()=>{item.voice=reader.result;storeItem(item)};reader.readAsDataURL(voiceBlob);}
   else storeItem(item);
 });
