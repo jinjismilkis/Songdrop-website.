@@ -2,6 +2,7 @@ const $ = (id) => document.getElementById(id);
 const STORAGE_KEY = "songdrop-dedications-v1";
 let dedications = loadDedications();
 let activeFilter = "All";
+let wallSearchTerm = "";
 let voiceBlob = null;
 let mediaRecorder = null;
 let audioChunks = [];
@@ -102,7 +103,12 @@ function showCreated(item){
 }
 async function copyText(text){try{await navigator.clipboard.writeText(text);toast("Link copied!");}catch{toast("Copy isn't available in this browser.");}}
 function renderWall(){
-  const list=dedications.filter(d=>activeFilter==="All"||d.mood===activeFilter);
+  const query=wallSearchTerm.trim().toLocaleLowerCase();
+  const list=dedications.filter(d=>{
+    const matchesMood=activeFilter==="All"||d.mood===activeFilter;
+    const searchable=[d.recipient,d.songTitle,d.artist,d.message,d.sender,d.mood].filter(Boolean).join(" ").toLocaleLowerCase();
+    return matchesMood&&(!query||searchable.includes(query));
+  });
   $("wallCount").textContent=list.length+" dedication"+(list.length===1?"":"s");
   $("emptyState").classList.toggle("hidden",list.length>0);
   $("wallGrid").innerHTML=list.map(d=>`<article class="wall-card theme-${escapeHtml(d.theme)}" data-open="${escapeHtml(d.id)}">
@@ -153,4 +159,5 @@ $("stopBtn").addEventListener("click",stopRecording);
 $("clearVoice").addEventListener("click",()=>{voiceBlob=null;if(voiceUrl)URL.revokeObjectURL(voiceUrl);voiceUrl=null;$("voicePlayback").src="";$("voicePlayback").classList.add("hidden");$("clearVoice").classList.add("hidden");$("recordStatus").textContent="A little voice note";$("recordHint").textContent="Up to 30 seconds · saved on this device";});
 
 function handleHash(){const match=location.hash.match(/card=([^&]+)/);if(match){const id=decodeURIComponent(match[1]);setTimeout(()=>openCard(id),100);}}
+$("wallSearch").addEventListener("input",e=>{wallSearchTerm=e.target.value;renderWall();});
 updatePreview();renderWall();handleHash();
