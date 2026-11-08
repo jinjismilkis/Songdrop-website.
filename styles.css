@@ -35,3 +35,56 @@
 .wall-search input{width:100%;min-width:0;border:0;outline:0;background:transparent;padding:13px 0;font:400 12px var(--sans);color:var(--ink)}
 .wall-search:focus-within{border-color:#a99be0;box-shadow:0 0 0 3px #eeeafd}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+/* songdrop refresh: warm editorial layout */
+:root{--ink:#211b2d;--muted:#777080;--purple:#7455a8;--purple-dark:#563b83;--cream:#faf7f2;--line:#ece5df;--serif:"Playfair Display",Georgia,serif;--sans:"DM Sans",Arial,sans-serif}
+body{background:#faf7f2;color:#211b2d}
+.topbar{max-width:1240px;height:84px}
+.brand{font-size:25px;letter-spacing:-1.5px}
+.brand-mark{background:#ede4f7;color:#6c4b9b;border-radius:50%;width:36px;height:36px}
+.nav-cta{background:#241d31;border-radius:12px;padding:13px 19px}
+.hero{max-width:1240px;min-height:540px;margin:20px auto 65px;padding:65px 42px;grid-template-columns:1.05fr .95fr;background:#f0e9f5;border-radius:30px;overflow:hidden}
+.hero h1{font-size:clamp(54px,6vw,82px);letter-spacing:-3px}
+.hero-copy>p{font-size:15px;max-width:470px}
+.hero-art{transform:scale(1.04)}
+.mock-card{border-radius:22px}
+.front-card{box-shadow:0 28px 70px #36254c28}
+.button{border-radius:12px;padding:15px 21px}
+.primary{background:#6f4d9b}
+.feature-strip{max-width:1155px;border-radius:20px;background:#eee8f2;padding:28px 34px}
+.section{max-width:1155px}
+.section-heading h2,.voice-copy h2{font-size:48px}
+.form-panel{border-radius:22px;padding:30px}
+.panel{box-shadow:0 18px 50px #32233b0b}
+.form-panel input:not([type=checkbox]),.form-panel textarea,.form-panel select{border-radius:12px;background:#fdfbfd;padding:14px}
+.dedication-card{border-radius:24px;min-height:410px;padding:25px}
+.cover-art{border-radius:18px}
+.wall-card{border-radius:20px;padding:20px}
+.voice-section{border-radius:28px;background:#292139}
+.wall-search,.song-search-input-wrap{border-radius:14px}
+.song-search-panel{margin:5px 0 19px;padding:17px;border:1px solid #ece5ef;border-radius:17px;background:linear-gradient(145deg,#fcfaff,#f7f2fa)}
+.song-search-panel>label{display:block;font-size:12px;font-weight:700;margin-bottom:9px;color:#494052}
+.song-search-input-wrap{display:flex;align-items:center;gap:10px;background:white;border:1px solid #e8e1ed;padding:0 13px}
+.song-search-input-wrap>span:first-child{font-size:23px;color:#8c78a4}
+.song-search-input-wrap input{flex:1;min-width:0;border:0!important;box-shadow:none!important;background:transparent!important;margin:0!important;padding:14px 0!important}
+.song-search-input-wrap .search-note{font-size:8px;letter-spacing:1.3px;color:#a397ae}
+.song-search-status{font-size:10px;color:#8b8293;margin:11px 2px 8px}
+.song-search-results{display:grid;gap:7px;max-height:310px;overflow:auto}
+.song-result{width:100%;display:flex;align-items:center;gap:11px;padding:8px;border:1px solid transparent;border-radius:12px;background:white;text-align:left;cursor:pointer;color:#30283a}
+.song-result:hover,.song-result:focus{border-color:#cbb8df;background:#fbf8ff}
+.song-result img,.song-result .result-cover{width:48px;height:48px;flex:none;border-radius:8px;object-fit:cover;background:#e9e0ef;display:grid;place-items:center}
+.song-result-copy{min-width:0;flex:1}
+.song-result-copy b,.song-result-copy small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.song-result-copy b{font-size:11px}
+.song-result-copy small{font-size:9px;color:#8a8192;margin-top:4px}
+.song-result-play{font-size:9px;color:#76549d;font-weight:700}
+.selected-song{display:flex;align-items:center;gap:10px;margin-top:10px;padding:10px;background:#eee7f5;border-radius:12px}
+.selected-song img{width:48px;height:48px;border-radius:9px;object-fit:cover}
+.selected-song b,.selected-song small{display:block}
+.selected-song b{font-size:11px}
+.selected-song small{font-size:9px;color:#756b80;margin-top:4px}
+.selected-song audio{width:100%;height:32px;margin-top:7px}
+.selected-song-copy{flex:1;min-width:0}
+.selected-song button{border:0;background:transparent;color:#76549d;font-size:10px;font-weight:700;cursor:pointer}
+.preview-thumb-image{width:100%;height:100%;object-fit:cover;border-radius:inherit}
+@media(max-width:680px){.hero{margin:12px 14px 48px;padding:35px 22px;border-radius:22px}.section-heading h2,.voice-copy h2{font-size:39px}.form-panel{padding:20px}.song-search-panel{padding:12px}}
