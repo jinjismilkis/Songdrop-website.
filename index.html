@@ -99,6 +99,11 @@
     <section class="section wall-section" id="wall">
       <div class="section-heading"><div><div class="eyebrow">A LITTLE CORNER OF THE INTERNET</div><h2>The song wall.</h2></div><p>Small notes, shared feelings.<br>Browse the latest public cards.</p></div>
       <div class="wall-toolbar"><div class="filter-pills" id="wallFilters"><button class="active" data-filter="All">All songs</button><button data-filter="Crush">Crush</button><button data-filter="Friendship">Friendship</button><button data-filter="Miss you">Miss you</button><button data-filter="Grateful">Grateful</button></div><span id="wallCount">0 dedications</span></div>
+      <div class="wall-search">
+        <label class="sr-only" for="wallSearch">Search dedications by recipient, song, artist, or message</label>
+        <span aria-hidden="true">⌕</span>
+        <input id="wallSearch" type="search" placeholder="Search a name, song, artist, or message..." autocomplete="off">
+      </div>
       <div class="wall-grid" id="wallGrid"></div>
       <div class="empty-state" id="emptyState"><span>♫</span><h3>The wall is waiting for its first song.</h3><p>Create a dedication and it will show up here on this device.</p><a href="#create" class="text-link">Make the first one ↗</a></div>
     </section>
