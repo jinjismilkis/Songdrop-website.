@@ -53,15 +53,23 @@
             <label>Pick a mood<select id="mood"><option value="Crush">Crush</option><option value="Friendship">Friendship</option><option value="Miss you">Miss you</option><option value="Grateful">Grateful</option><option value="Heartfelt">Heartfelt</option><option value="Just because">Just because</option></select></label>
             <label>Card style<select id="theme"><option value="lavender">Lavender dream</option><option value="sunset">Soft sunset</option><option value="midnight">Midnight blue</option><option value="peach">Peach note</option></select></label>
           </div>
-          <label>Song title<input id="songTitle" maxlength="80" placeholder="e.g. Golden Hour" required></label>
-          <label>Artist<input id="artist" maxlength="80" placeholder="e.g. JVKE"></label>
-          <label>Song link <span class="optional">optional</span><input id="songUrl" type="url" placeholder="Paste a Spotify, YouTube, SoundCloud, or audio-file link"><small class="field-hint">Recipients can play supported songs inside their song card.</small></label>
-          <label>Album cover image URL <span class="optional">optional</span><input id="coverUrl" type="url" placeholder="Paste a link to the album artwork"><small class="field-hint">This artwork will appear in the center of the vinyl record.</small></label>
-          <div class="two-col clip-fields">
-            <label>Clip starts at <span class="optional">seconds</span><input id="clipStart" type="number" min="0" step="1" placeholder="e.g. 30"></label>
-            <label>Clip ends at <span class="optional">seconds</span><input id="clipEnd" type="number" min="1" step="1" placeholder="e.g. 60"></label>
+          <div class="song-search-panel">
+            <label for="songSearchInput">Find your song</label>
+            <div class="song-search-input-wrap"><span>⌕</span><input id="songSearchInput" type="search" placeholder="Search a song or artist..." autocomplete="off"><span class="search-note">SEARCH</span></div>
+            <p class="field-hint">Search the music library and choose a song. No links needed.</p>
+            <div id="songSearchStatus" class="song-search-status" aria-live="polite">Start typing to find a song.</div>
+            <div id="songSearchResults" class="song-search-results"></div>
+            <div id="selectedSong" class="selected-song hidden"></div>
           </div>
-          <small class="field-hint clip-note">Choose a start and end time to play only that part. Clip timing works with YouTube and direct audio links. Spotify and SoundCloud control playback through their own players.</small>
+          <input id="songTitle" type="hidden" required>
+          <input id="artist" type="hidden">
+          <input id="songUrl" type="hidden">
+          <input id="coverUrl" type="hidden">
+          <div class="two-col clip-fields">
+            <label>Preview starts at <span class="optional">seconds</span><input id="clipStart" type="number" min="0" max="29" step="1" placeholder="0"></label>
+            <label>Preview ends at <span class="optional">seconds</span><input id="clipEnd" type="number" min="1" max="30" step="1" placeholder="30"></label>
+          </div>
+          <small class="field-hint clip-note">Song previews are usually up to 30 seconds. Set a start and end time if you want a shorter part.</small>
           <div class="privacy-row"><div><b>Send anonymously</b><small>Your name won't appear on the card.</small></div><label class="switch"><input id="anonymous" type="checkbox" checked><span></span></label></div>
           <label id="senderWrap" class="hidden">Your name<input id="sender" maxlength="45" placeholder="Your name"></label>
           <div class="privacy-row"><div><b>Mystery mode</b><small>Let them guess who sent it.</small></div><label class="switch"><input id="mystery" type="checkbox"><span></span></label></div>
@@ -76,7 +84,7 @@
             <div class="card-top"><span> A SONG FOR <b id="previewRecipient">SOMEONE SPECIAL</b></span><span>♡</span></div>
             <div class="cover-art"><span class="cover-spark">✦</span><span class="cover-note">♫</span><span class="cover-orbit"></span></div>
             <div class="preview-message" id="previewMessage">“Some songs say the things we don't know how to.”</div>
-            <div class="song-line"><div class="song-thumb">♫</div><div class="song-meta"><b id="previewSong">Your song goes here</b><small id="previewArtist">Artist name</small></div><span class="equalizer">▂▅▃▆▂</span></div>
+            <div class="song-line"><div class="song-thumb" id="previewThumb">♫</div><div class="song-meta"><b id="previewSong">Choose a song</b><small id="previewArtist">Search the music library</small></div><span class="equalizer">▂▅▃▆▂</span></div>
             <div class="card-bottom"><span id="previewMood">✦ CRUSH</span><span>made with songdrop</span></div>
           </article>
           <div class="preview-tip"><span>✧</span> Your card updates as you type. Choose a style that fits the feeling.</div>
